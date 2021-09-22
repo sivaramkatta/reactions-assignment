@@ -1,5 +1,11 @@
+import Reactions from "./components/Reactions";
+
 function App() {
-  return <h1>Hello</h1>;
+  return (
+    <div style={{ margin: 150 }}>
+      <Reactions />
+    </div>
+  );
 }
 
 export default App;
