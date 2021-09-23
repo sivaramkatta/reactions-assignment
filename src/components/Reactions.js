@@ -1,67 +1,79 @@
 import { useState } from "react";
 import "./Reaction.css";
-import { ReactComponent as ReactLogo } from "../media/addReactionIcon.svg";
+import { logged_in, addReaction, deleteReaction } from "../api";
+import { useMutation } from "react-query";
 
-const data = [
-  {
-    id: 1,
-    name: "Like",
-    emoji: "👍"
-  },
-  {
-    id: 2,
-    name: "Love",
-    emoji: "❤️"
-  },
-  {
-    id: 3,
-    name: "Haha",
-    emoji: "😂"
-  },
-  {
-    id: 4,
-    name: "Wow",
-    emoji: "😮"
-  },
-  {
-    id: 5,
-    name: "Sad",
-    emoji: "😥"
-  },
-  {
-    id: 6,
-    name: "Angry",
-    emoji: "😡"
-  }
-];
+function getEmoji(id, reactionData) {
+  return reactionData.find(item => item.id == id);
+}
 
-function Reactions() {
-  const [show, setShow] = useState(false);
+function TotalTile({
+  emojiData,
+  reaction_data,
+  setReactions,
+  content_reactions
+}) {
+  const selected = reaction_data.some(item => item.user_id === logged_in);
   return (
-    <div style={{ display: "flex" }}>
-      <div
+    <div
+      onClick={() => {
+        const index = reaction_data.findIndex(
+          item => item.user_id === logged_in
+        );
+        if (index >= 0) {
+          reaction_data.splice(index, 1);
+        } else {
+          reaction_data.push({ user_id: logged_in, reaction_id: 12 });
+        }
+        setReactions({ ...content_reactions });
+      }}
+      style={{
+        padding: 8,
+        backgroundColor: selected ? "#EDF5FF" : "#F4F4F4",
+        border: selected ? "1px solid #0F62FE" : "1px solid #FFFFFF",
+        borderRadius: 100,
+        height: 32,
+        cursor: "pointer",
+        marginRight: 6
+      }}
+    >
+      <p
         style={{
-          padding: 8,
-          backgroundColor: "#F4F4F4",
-          border: "1px solid #FFFFFF",
-          borderRadius: 100,
-          height: 32,
-          cursor: "pointer",
-          marginRight: 6
+          fontSize: 12,
+          lineHeight: "16px",
+          color: "#525252"
         }}
       >
-        <p
-          style={{
-            fontFamily: "IBM Plex Sans",
-            fontSize: 12,
-            lineHeight: "16px",
-            color: "#525252"
-          }}
-        >
-          {data[0].emoji} . 12
-        </p>
-      </div>
+        {emojiData.emoji} . {reaction_data.length}
+      </p>
+    </div>
+  );
+}
+
+function Reactions({ data, content_reactions, content_id }) {
+  const [show, setShow] = useState(false);
+  const [reactions, setReactions] = useState(content_reactions);
+  const reactionTypes = Object.keys(reactions);
+  const addReactionMutation = useMutation(addReaction);
+  const deleteeReactionMutation = useMutation(deleteReaction);
+  return (
+    <div style={{ display: "flex" }}>
+      {reactionTypes.map(item => {
+        const emojiData = getEmoji(item, data);
+        return (
+          <TotalTile
+            key={item.reaction_id}
+            emojiData={emojiData}
+            reaction_data={reactions[item]}
+            content_reactions={content_reactions}
+            setReactions={setReactions}
+          />
+        );
+      })}
       <div
+        onClick={() => {
+          setShow(prev => !prev);
+        }}
         style={{
           height: 32,
           width: 32,
@@ -77,6 +89,9 @@ function Reactions() {
       >
         {show && (
           <div
+            onClick={e => {
+              e.stopPropagation();
+            }}
             style={{
               position: "absolute",
               height: 32,
@@ -86,12 +101,44 @@ function Reactions() {
               display: "flex",
               padding: "7px 13px",
               width: 233,
-              top: -37
+              top: -37,
+              backgroundColor: "white"
             }}
           >
             {data.map(item => (
-              <div className="emojiDiv">
-                <p key={item.id} className="emojiIcon">
+              <div className="emojiDiv" key={item.id}>
+                <p
+                  key={item.id}
+                  className="emojiIcon"
+                  onClick={async () => {
+                    const reaction_list = reactions[item.id];
+                    let index, item_obj;
+                    for (let i = 0; i < reaction_list.length; i++) {
+                      if (reaction_list[i].user_id === logged_in) {
+                        index = i;
+                        item_obj = reaction_list[i];
+                        break;
+                      }
+                    }
+                    if (index >= 0) {
+                      await deleteeReactionMutation.mutateAsync(
+                        item_obj.reaction_id
+                      );
+                      reaction_list.splice(index, 1);
+                    } else {
+                      const resp = await addReactionMutation.mutateAsync({
+                        user_id: logged_in,
+                        reaction_id: item.id,
+                        content_id
+                      });
+                      reaction_list.push({
+                        user_id: logged_in,
+                        reaction_id: resp.id
+                      });
+                    }
+                    setReactions({ ...reactions });
+                  }}
+                >
                   {item.emoji}
                 </p>
                 <div className="tooltip">
@@ -101,11 +148,10 @@ function Reactions() {
             ))}
           </div>
         )}
-        <ReactLogo
+        <img
+          src="/media/addReactionIcon.svg"
+          alt="addReaction"
           style={{ marginRight: 1 }}
-          onClick={() => {
-            setShow(prev => !prev);
-          }}
         />
       </div>
     </div>

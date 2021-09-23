@@ -1,10 +1,19 @@
-import Reactions from "./components/Reactions";
+import { QueryClient, QueryClientProvider } from "react-query";
+import Home from "./screens/Home";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity
+    }
+  }
+});
 
 function App() {
   return (
-    <div style={{ margin: 150 }}>
-      <Reactions />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Home />
+    </QueryClientProvider>
   );
 }
 
