@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./Reaction.css";
 import { logged_in, addReaction, deleteReaction } from "../api";
 import { useMutation } from "react-query";
+import react from "react";
 
 function getEmoji(id, reactionData) {
   return reactionData.find(item => item.id == id);
@@ -11,19 +12,36 @@ function TotalTile({
   emojiData,
   reaction_data,
   setReactions,
-  content_reactions
+  content_reactions,
+  addReactionMutation,
+  deleteeReactionMutation,
+  content_id
 }) {
   const selected = reaction_data.some(item => item.user_id === logged_in);
+  if (reaction_data.length === 0) {
+    return null;
+  }
   return (
     <div
-      onClick={() => {
-        const index = reaction_data.findIndex(
-          item => item.user_id === logged_in
-        );
+      onClick={async () => {
+        let index, item_obj;
+        for (let i = 0; i < reaction_data.length; i++) {
+          if (reaction_data[i].user_id === logged_in) {
+            index = i;
+            item_obj = reaction_data[i];
+            break;
+          }
+        }
         if (index >= 0) {
+          await deleteeReactionMutation.mutateAsync(item_obj.reaction_id);
           reaction_data.splice(index, 1);
         } else {
-          reaction_data.push({ user_id: logged_in, reaction_id: 12 });
+          const resp = await addReactionMutation.mutateAsync({
+            user_id: logged_in,
+            reaction_id: emojiData.id,
+            content_id
+          });
+          reaction_data.push({ user_id: logged_in, reaction_id: resp.id });
         }
         setReactions({ ...content_reactions });
       }}
@@ -56,6 +74,7 @@ function Reactions({ data, content_reactions, content_id }) {
   const reactionTypes = Object.keys(reactions);
   const addReactionMutation = useMutation(addReaction);
   const deleteeReactionMutation = useMutation(deleteReaction);
+  let timer;
   return (
     <div style={{ display: "flex" }}>
       {reactionTypes.map(item => {
@@ -67,12 +86,20 @@ function Reactions({ data, content_reactions, content_id }) {
             reaction_data={reactions[item]}
             content_reactions={content_reactions}
             setReactions={setReactions}
+            deleteeReactionMutation={deleteeReactionMutation}
+            addReactionMutation={addReactionMutation}
+            content_id={content_id}
           />
         );
       })}
       <div
         onClick={() => {
           setShow(prev => !prev);
+        }}
+        onMouseLeave={() => {
+          timer = setTimeout(() => {
+            setShow(false);
+          }, 800);
         }}
         style={{
           height: 32,
@@ -91,6 +118,9 @@ function Reactions({ data, content_reactions, content_id }) {
           <div
             onClick={e => {
               e.stopPropagation();
+            }}
+            onMouseEnter={() => {
+              clearTimeout(timer);
             }}
             style={{
               position: "absolute",
@@ -111,7 +141,11 @@ function Reactions({ data, content_reactions, content_id }) {
                   key={item.id}
                   className="emojiIcon"
                   onClick={async () => {
-                    const reaction_list = reactions[item.id];
+                    let reaction_list = reactions[item.id];
+                    if (!reaction_list) {
+                      reactions[item.id] = [];
+                      reaction_list = reactions[item.id];
+                    }
                     let index, item_obj;
                     for (let i = 0; i < reaction_list.length; i++) {
                       if (reaction_list[i].user_id === logged_in) {
