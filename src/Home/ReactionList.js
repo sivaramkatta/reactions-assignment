@@ -95,7 +95,7 @@ function ReactionList({ data, content_reactions, content_id }) {
           </div>
         )}
         <img
-          src="/media/addReactionIcon.svg"
+          src={`${process.env.PUBLIC_URL}/media/addReactionIcon.svg`}
           alt="addReaction"
           style={{ marginRight: 1 }}
         />

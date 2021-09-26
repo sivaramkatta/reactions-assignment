@@ -16,7 +16,11 @@ function Post({ reactions_list, content, content_reactions }) {
         {content.type === "TEXT" ? (
           <p className="post_text">{content.text}</p>
         ) : (
-          <img className="post_media" src={content?.image} alt="scenary" />
+          <img
+            className="post_media"
+            src={`${process.env.PUBLIC_URL}${content?.image}`}
+            alt="scenary"
+          />
         )}
         <ReactionList
           data={reactions_list}
