@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "react-query";
-import Home from "./screens/Home";
+import Home from "./Home/";
 
 const queryClient = new QueryClient({
   defaultOptions: {

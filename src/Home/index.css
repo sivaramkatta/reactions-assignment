@@ -1,0 +1,118 @@
+.container {
+  margin: 50px;
+}
+
+.container_headerText {
+  margin-bottom: 24px;
+  padding-left: 25px;
+}
+
+.post {
+  padding: 25px;
+  display: flex;
+}
+
+.post_avatar {
+  height: 32px;
+  width: 32px;
+  margin-right: 8px;
+}
+
+.post_postedBy {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.post_text {
+  font-size: 14px;
+  line-height: 18px;
+  margin: 8px 0px;
+}
+
+.post_media {
+  height: 200px;
+  width: 223px;
+  margin: 8px 0px;
+}
+
+.reactions {
+  display: flex;
+}
+
+.rections_listIcon {
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #edeef0;
+  border-radius: 100px;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+  position: relative;
+}
+
+.reaction_listContainer {
+  position: absolute;
+  height: 32px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.03);
+  border-radius: 24px;
+  display: flex;
+  padding: 7px 13px;
+  width: 233px;
+  top: -37px;
+  background-color: white;
+}
+
+.reaction_emojiIcon {
+  cursor: pointer;
+  margin-right: 8px;
+  margin-left: 8px;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.reaction_emojiIcon:hover {
+  cursor: pointer;
+  margin-right: 1px;
+  margin-left: 1px;
+  font-size: 32px;
+  line-height: 1px;
+}
+
+.reaction_tooltip {
+  display: none;
+}
+
+.reaction_emojiIcon:hover ~ .reaction_tooltip {
+  display: block;
+  position: absolute;
+  top: -40px;
+  background: #161616;
+  border-radius: 100px;
+  padding: 4px 8px;
+  margin-left: -3px;
+}
+
+.reaction_reactionName {
+  font-size: 12px;
+  line-height: 16px;
+  color: white;
+  letter-spacing: 0.32px;
+}
+
+.reactionTile_contaner {
+  padding: 8px;
+  border-radius: 100px;
+  height: 32px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.reactionTile_name {
+  font-size: 12px;
+  line-height: 16px;
+  color: #525252;
+}
